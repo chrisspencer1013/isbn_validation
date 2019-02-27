@@ -1,0 +1,45 @@
+import re
+
+def valid_isbn(isbn):
+    isbn = isbn.replace(" ", '').replace("-","").upper() 
+    #print(isbn)
+    if len(isbn) != 13 and len(isbn) != 10:
+        return False
+    elif len(isbn) == 10:
+        sre_match = re.search(r'^(\d{9})(X|\d{1})', isbn) 
+        if not sre_match: 
+            return False
+        check = 10 if sre_match.group(2) == 'X' else int(sre_match.group(2))
+        results = sum((i + 1) * int(digit) for i, digit in enumerate(sre_match.group(1)))
+        return (results % 11 == check)  
+    elif len(isbn) == 13:
+        sre_match = re.search(r'^(\d{12})(\d{1})', isbn) 
+        if not sre_match: 
+            return False
+        check = int(sre_match.group(2))
+        sum_digits = 0
+        for i, digit in enumerate(sre_match.group(1)):
+            if (i + 1) % 2 == 0:
+                sum_digits += int(digit) * 3
+            else:
+                sum_digits += int(digit)
+        results = (10 - (sum_digits % 10)) % 10
+        return (results == check)  
+
+
+
+assert(valid_isbn('978-3-16-148410-0')) #0 create asserts
+assert(valid_isbn('978-1-4028-9462-6'))
+assert(valid_isbn('1-4028-9462-7'))
+
+assert(not valid_isbn('1-4028-9462-8'))
+assert(not valid_isbn('1-4028-9462-72'))
+assert(not valid_isbn('1-4028-9462-7221'))
+assert(not valid_isbn('1-4028-9462-72211-'))
+assert(not valid_isbn(''))
+assert(not valid_isbn(' '))
+assert(not valid_isbn(' 999999999'))
+assert(not valid_isbn(' 1`'))
+assert(not valid_isbn('Hello there fellow human'))
+
+
